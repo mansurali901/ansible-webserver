@@ -1,0 +1,59 @@
+- name: Add Nginx Repository PPA
+  apt_repository: repo='ppa:nginx/stable' state=present
+  register: ppastable
+
+#- name: Install Nginx
+#  apt: pkg=nginx state=present update_cache=true
+#  register: installnginx
+
+#- name: "Download Nginx Configuration Files"
+#  unarchive:
+#    src: http://34.231.245.250/proofpoints/conffiles/nginx.conf.zip 
+#    dest: /etc/nginx/
+#    remote_src: yes
+#  notify:
+#   - Start Ngnix 
+#  register: nginxstart
+
+- name: Install Nginx
+  apt: pkg=nginx state=present update_cache=true
+  register: installnginx
+ 
+- name: Install PHP
+#  when: nginxstart|success
+  apt: pkg=php state=present update_cache=true
+
+- name: Install PHP FPM
+  apt: pkg=php-fpm state=present update_cache=true
+  notify:
+   - Restart Nginx
+
+- name: Add SRV1.exAMPL.com Site Config
+  register: srvconfig
+  template: src=roles/nginx/templates/srv1.example.com.j2 dest=/etc/nginx/sites-available/{{ domain }}.conf owner=root group=root
+
+- name: Enable {{ domain }} Site Config
+  when: srvconfig is success
+  file: src=/etc/nginx/sites-available/{{ domain }}.conf dest=/etc/nginx/sites-enabled/{{ domain }}.conf state=link
+  register: sitelink
+
+- name: Deleting Default Configurations 
+  when: sitelink is success
+  file: path=/etc/nginx/site-enabled/default state=absent
+
+- name: Copying PHP Files
+  when: sitelink is success
+  copy:
+      src: roles/nginx/files/index.php
+      dest: /usr/share/nginx/html/{{ domain }}/
+      owner: root
+      group: root
+      mode: 0644
+      backup: yes
+  register: indexcopy
+  notify:
+   - Restart Nginx 
+
+- name: Removing Index.html file
+  when: indexcopy is success
+  file: path=/usr/share/nginx/html/index.html state=absent

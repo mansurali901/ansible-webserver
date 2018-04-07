@@ -1,0 +1,8 @@
+---
+domain: "srv1.example.com"
+ssl_crt: "/usr/ssl/private/*.example.com.crt"
+ssl_key: "/usr/ssl/private/*.example.com.key"
+nginxconf: "/etc/nginx/"
+docpath: "/usr/share/nginx/html"
+srvport: "80"
+allowedfiles: "index.html index.php index.htm index.nginx-debian.html"
