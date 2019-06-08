@@ -1,7 +1,10 @@
 ## Setup High Performance NginX Web server with Ansible Playbook
 Author : Mansur Ul Hasan
-	 Sr, NetOps Engineer GFK Etilize
+
+Sr, NetOps Engineer GFK Etilize
+
 Email  : mansurali901@gmail.com
+
 Date   : 05 April, 2018 
 
 Technical Details : 
